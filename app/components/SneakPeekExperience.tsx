@@ -164,7 +164,7 @@ function BoxPatterns({ shoe }: { shoe: Sneaker }) {
 
 function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void }) {
   const isConverse = shoe.pattern === "converse-badge";
-  const isNikePhotoCard = shoe.id === "zoom-winflo-8";
+  const isNikePhotoCard = shoe.id === "dunk-low";
 
   if (isNikePhotoCard) {
     return (
@@ -333,7 +333,7 @@ function OpenBoxDetail({
   onNext: () => void;
   reduceMotion: boolean;
 }) {
-  const compactHeroArtwork = shoe.id === "zoom-winflo-8";
+  const compactHeroArtwork = shoe.id === "dunk-low";
   const swatches = shoe.detailColorSwatches && shoe.detailColorSwatches.length > 0
     ? shoe.detailColorSwatches
     : ["#ffffff", shoe.shoeAccentStart, shoe.boxColor];
@@ -361,7 +361,7 @@ function OpenBoxDetail({
       ]
     : (shoe.gallery.length > 0 ? [...shoe.gallery, ...shoe.gallery] : [shoe.detailShoeImage ?? ""]);
 
-  const inspirationPhotos = shoe.id === "zoom-winflo-8"
+  const inspirationPhotos = shoe.id === "dunk-low"
     ? [
         "/images/nike inspo 1.jpg",
         "/images/nike inspo 2.jpg",

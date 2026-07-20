@@ -52,7 +52,7 @@ export type Sneaker = {
 
 export const shoes: Sneaker[] = [
   {
-    id: "zoom-winflo-8",
+    id: "dunk-low",
     brand: "NIKE",
     model: "Dunk Low",
     nickname: "Dunk Low",
