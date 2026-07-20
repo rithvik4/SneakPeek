@@ -70,6 +70,7 @@ function getColorTooltipLabel(hexColor: string, shoe: Sneaker) {
     "#2c4741": "Deep Green",
     "#3d68ee": "Blue",
     "#d7262d": "Red",
+    "#7b2137": "Burgundy",
     "#7dd8ef": "Aqua",
     "#d9d9d9": "Gray",
     "#8d8d8d": "Gray",
@@ -163,6 +164,37 @@ function BoxPatterns({ shoe }: { shoe: Sneaker }) {
 
 function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void }) {
   const isConverse = shoe.pattern === "converse-badge";
+  const isNikePhotoCard = shoe.id === "zoom-winflo-8";
+
+  if (isNikePhotoCard) {
+    return (
+      <motion.button
+        type="button"
+        onClick={onSelect}
+        whileHover={{ y: -6, scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
+        aria-label={`Open ${shoe.model}`}
+      >
+        <Image
+          src="/images/nike-box.png"
+          alt="Nike shoebox"
+          width={768}
+          height={332}
+          className="block h-auto w-full"
+          sizes="(min-width: 1024px) 400px, 90vw"
+        />
+
+        <div
+          className="absolute right-[3.6%] top-1/2 -translate-y-1/2 rounded-[0.85rem] bg-white px-5 py-3 text-[1.35rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-6 sm:text-[1.5rem]"
+          style={{ backgroundColor: shoe.boxLabelColor }}
+        >
+          <span className="block -rotate-[2deg] font-[cursive] tracking-tight">{shoe.collectionLabel}</span>
+        </div>
+      </motion.button>
+    );
+  }
 
   if (isConverse) {
     return (
@@ -235,14 +267,19 @@ function OpenBoxImageReveal({
   openBoxImage,
   shoeImage,
   reduceMotion,
+  compactBox = false,
 }: {
   openBoxImage: string;
   shoeImage: string;
   reduceMotion: boolean;
+  compactBox?: boolean;
 }) {
+  const shoeInitialY = compactBox ? 94 : 80;
+  const shoeFinalY = compactBox ? -46 : -78;
+
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[0.3rem]">
-      <div className="absolute inset-0 scale-[1.20]">
+      <div className={`absolute inset-0 ${compactBox ? "scale-[0.92] sm:scale-[0.9]" : "scale-[1.20]"}`}>
         <Image
           src={openBoxImage}
           alt="Open shoe box"
@@ -253,10 +290,10 @@ function OpenBoxImageReveal({
       </div>
 
       <motion.div
-        initial={reduceMotion ? false : { y: 80, opacity: 0, scale: 0.84, rotate: -30 }}
-        animate={reduceMotion ? undefined : { y: -78, opacity: 1, scale: 1.01, rotate: -22 }}
+        initial={reduceMotion ? false : { y: shoeInitialY, opacity: 0, scale: 0.84, rotate: -30 }}
+        animate={reduceMotion ? undefined : { y: shoeFinalY, opacity: 1, scale: 1.01, rotate: -22 }}
         transition={{ duration: 0.78, ease: [0.2, 1, 0.3, 1], delay: 0.72 }}
-        className="absolute left-1/2 top-[10%] z-10 w-[68%] -translate-x-1/2 sm:top-[7%] sm:w-[60%] lg:top-[5%]"
+        className={`absolute left-1/2 z-10 -translate-x-1/2 ${compactBox ? "top-[8%] w-[78%] sm:top-[5%] sm:w-[70%] lg:top-[3%]" : "top-[10%] w-[68%] sm:top-[7%] sm:w-[60%] lg:top-[5%]"}`}
       >
         <motion.div
           animate={reduceMotion ? undefined : { y: [0, -9, 0] }}
@@ -265,10 +302,10 @@ function OpenBoxImageReveal({
           <Image
             src={shoeImage}
             alt="Shoe pair emerging"
-            width={420}
-            height={420}
+            width={480}
+            height={500}
             className="h-auto w-full object-contain drop-shadow-[0_16px_28px_rgba(0,0,0,0.34)]"
-            sizes="(min-width: 1024px) 390px, 55vw"
+            sizes="(min-width: 1024px) 450px, 62vw"
           />
         </motion.div>
       </motion.div>
@@ -296,6 +333,7 @@ function OpenBoxDetail({
   onNext: () => void;
   reduceMotion: boolean;
 }) {
+  const compactHeroArtwork = shoe.id === "zoom-winflo-8";
   const swatches = shoe.detailColorSwatches && shoe.detailColorSwatches.length > 0
     ? shoe.detailColorSwatches
     : ["#ffffff", shoe.shoeAccentStart, shoe.boxColor];
@@ -323,20 +361,30 @@ function OpenBoxDetail({
       ]
     : (shoe.gallery.length > 0 ? [...shoe.gallery, ...shoe.gallery] : [shoe.detailShoeImage ?? ""]);
 
-  const inspirationPhotos = shoe.id === "converse-chuck-70"
+  const inspirationPhotos = shoe.id === "zoom-winflo-8"
     ? [
-        "/images/chunk70 5.jpg",
-        "/images/chunk70 8.jpg",
-        "/images/chunk70 11.jpg",
-        "/images/chunk70 7.jpg",
-        "/images/chunk70 10.jpg",
-        "/images/chunk70 9.jpg",
-        "/images/chunk70 1.jpg",
-        "/images/chunk70 2.jpg",
-        "/images/chunk70 13.webp",
-        "/images/chunk70 4.webp",
+        "/images/nike inspo 1.jpg",
+        "/images/nike inspo 2.jpg",
+        "/images/nike inspo 3.jpg",
+        "/images/nike inspo 4.jpg",
+        "/images/nike inspo 5.jpg",
+        "/images/nike inspo 8.jpg",
+        "/images/nike inspo 7.jpg",
       ]
-    : (shoe.gallery.length > 0 ? [...shoe.gallery, ...shoe.gallery, ...shoe.gallery] : [shoe.detailShoeImage ?? ""]);
+    : shoe.id === "converse-chuck-70"
+      ? [
+          "/images/chunk70 5.jpg",
+          "/images/chunk70 8.jpg",
+          "/images/chunk70 11.jpg",
+          "/images/chunk70 7.jpg",
+          "/images/chunk70 10.jpg",
+          "/images/chunk70 9.jpg",
+          "/images/chunk70 1.jpg",
+          "/images/chunk70 2.jpg",
+          "/images/chunk70 13.webp",
+          "/images/chunk70 4.webp",
+        ]
+      : (shoe.gallery.length > 0 ? [...shoe.gallery, ...shoe.gallery, ...shoe.gallery] : [shoe.detailShoeImage ?? ""]);
 
   return (
     <motion.section
@@ -368,12 +416,13 @@ function OpenBoxDetail({
           <IoChevronBack className="h-4 w-4" aria-hidden="true" />
         </button>
 
-        <div className="relative h-[27rem] w-full max-w-[25rem] justify-self-center sm:h-[32rem] sm:max-w-[30rem] lg:h-[33rem] lg:max-w-[31rem]">
+        <div className={`relative w-full justify-self-center ${compactHeroArtwork ? "h-[22rem] max-w-[20rem] sm:h-[25rem] sm:max-w-[23rem] lg:h-[26rem] lg:max-w-[24rem]" : "h-[27rem] max-w-[25rem] sm:h-[32rem] sm:max-w-[30rem] lg:h-[33rem] lg:max-w-[31rem]"}`}>
           {shoe.detailOpenBoxImage && shoe.detailShoeImage ? (
             <OpenBoxImageReveal
               openBoxImage={shoe.detailOpenBoxImage}
               shoeImage={shoe.detailShoeImage}
               reduceMotion={reduceMotion}
+              compactBox={compactHeroArtwork}
             />
           ) : (
             <OpenBox3DScene boxColor={shoe.boxColor} shoeImage={shoe.detailShoeImage} reduceMotion={reduceMotion} />
@@ -390,7 +439,7 @@ function OpenBoxDetail({
         </button>
       </div>
 
-      <div className="max-w-2xl -mt-16 sm:-mt-20 lg:-mt-24">
+      <div className={shoe.id === "converse-chuck-70" ? "max-w-2xl -mt-16 sm:-mt-20 lg:-mt-24" : "max-w-2xl -mt-12 sm:-mt-16 lg:-mt-5"}>
         <h1 className="text-5xl font-semibold tracking-[-0.04em] text-[#111] sm:text-6xl">{shoe.model}</h1>
         <p className="mt-3 text-sm font-medium uppercase tracking-[0.26em] text-black/35">{shoe.brand}</p>
       </div>
