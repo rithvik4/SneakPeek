@@ -13,7 +13,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "SneakPeek | Cinematic Sneaker Showcase",
+  title: "SneakPeek",
   description: "A luxury interactive sneaker storytelling experience by Rithvik Kumar.",
 };
 

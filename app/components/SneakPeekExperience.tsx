@@ -15,6 +15,60 @@ const OpenBox3DScene = dynamic(
   { ssr: false }
 );
 
+let tapSoundContext: AudioContext | null = null;
+let lastTapSoundAt = 0;
+
+function playHoverTapSound() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const now = performance.now();
+  if (now - lastTapSoundAt < 70) {
+    return;
+  }
+  lastTapSoundAt = now;
+
+  if (!tapSoundContext) {
+    const AudioContextClass = window.AudioContext
+      || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!AudioContextClass) {
+      return;
+    }
+
+    tapSoundContext = new AudioContextClass();
+  }
+
+  const ctx = tapSoundContext;
+  const triggerTap = () => {
+    const startAt = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(640, startAt);
+    osc.frequency.exponentialRampToValueAtTime(220, startAt + 0.045);
+
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.500, startAt + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.07);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(startAt);
+    osc.stop(startAt + 0.075);
+  };
+
+  if (ctx.state === "suspended") {
+    void ctx.resume().then(triggerTap).catch(() => undefined);
+    return;
+  }
+
+  triggerTap();
+}
+
 function hexToRgba(hexColor: string, alpha: number) {
   const clean = hexColor.replace("#", "").trim();
   const normalized = clean.length === 3
@@ -165,6 +219,13 @@ function BoxPatterns({ shoe }: { shoe: Sneaker }) {
 function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void }) {
   const isConverse = shoe.pattern === "converse-badge";
   const isNikePhotoCard = shoe.id === "dunk-low";
+  const isPumaPhotoCard = shoe.id === "future-rider";
+  const isNewBalancePhotoCard = shoe.id === "new-balance-1906r";
+  const isSambaPhotoCard = shoe.id === "adidas-samba";
+  const hoverSoundHandlers = {
+    onMouseEnter: playHoverTapSound,
+    onFocus: playHoverTapSound,
+  };
 
   if (isNikePhotoCard) {
     return (
@@ -176,10 +237,43 @@ function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
         aria-label={`Open ${shoe.model}`}
+        {...hoverSoundHandlers}
       >
         <Image
-          src="/images/nike-box.png"
+          src="/images/nike-box-1.png"
           alt="Nike shoebox"
+          width={768}
+          height={332}
+          loading="eager"
+          className="block h-auto w-full"
+          sizes="(min-width: 1024px) 400px, 90vw"
+        />
+
+        <div
+          className="absolute right-[3.6%] top-[76%] -translate-y-1/2 rounded-[0.2rem] bg-white px-2.5 py-1.5 text-[0.9rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-3 sm:py-1.5 sm:text-[1.02rem]"
+          style={{ backgroundColor: shoe.boxLabelColor }}
+        >
+          <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
+        </div>
+      </motion.button>
+    );
+  }
+
+  if (isPumaPhotoCard) {
+    return (
+      <motion.button
+        type="button"
+        onClick={onSelect}
+        whileHover={{ y: -6, scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
+        aria-label={`Open ${shoe.model}`}
+        {...hoverSoundHandlers}
+      >
+        <Image
+          src="/images/puma-box.png"
+          alt="Puma shoebox"
           width={768}
           height={332}
           className="block h-auto w-full"
@@ -187,10 +281,74 @@ function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void
         />
 
         <div
-          className="absolute right-[3.6%] top-1/2 -translate-y-1/2 rounded-[0.85rem] bg-white px-5 py-3 text-[1.35rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-6 sm:text-[1.5rem]"
+          className="absolute right-[3.6%] top-[76%] -translate-y-1/2 rounded-[0.2rem] bg-white px-2.5 py-1.5 text-[0.9rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-3 sm:py-1.5 sm:text-[1.02rem]"
           style={{ backgroundColor: shoe.boxLabelColor }}
         >
-          <span className="block -rotate-[2deg] font-[cursive] tracking-tight">{shoe.collectionLabel}</span>
+          <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
+        </div>
+      </motion.button>
+    );
+  }
+
+  if (isNewBalancePhotoCard) {
+    return (
+      <motion.button
+        type="button"
+        onClick={onSelect}
+        whileHover={{ y: -6, scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
+        aria-label={`Open ${shoe.model}`}
+        {...hoverSoundHandlers}
+      >
+        <Image
+          src="/images/new-balance-box-1.png"
+          alt="New Balance shoebox"
+          width={768}
+          height={332}
+          loading="eager"
+          className="block h-auto w-full"
+          sizes="(min-width: 1024px) 400px, 90vw"
+        />
+
+        <div
+          className="absolute right-[3.6%] top-[76%] -translate-y-1/2 rounded-[0.2rem] bg-white px-2.5 py-1.5 text-[0.9rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-3 sm:py-1.5 sm:text-[1.02rem]"
+          style={{ backgroundColor: shoe.boxLabelColor }}
+        >
+          <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
+        </div>
+      </motion.button>
+    );
+  }
+
+  if (isSambaPhotoCard) {
+    return (
+      <motion.button
+        type="button"
+        onClick={onSelect}
+        whileHover={{ y: -6, scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
+        aria-label={`Open ${shoe.model}`}
+        {...hoverSoundHandlers}
+      >
+        <Image
+          src="/images/adidas-samba.png"
+          alt="Adidas shoebox"
+          width={768}
+          height={332}
+          loading="eager"
+          className="block h-auto w-full"
+          sizes="(min-width: 1024px) 400px, 90vw"
+        />
+
+        <div
+          className="absolute right-[3.6%] top-[76%] -translate-y-1/2 rounded-[0.2rem] bg-white px-2.5 py-1.5 text-[0.9rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-3 sm:py-1.5 sm:text-[1.02rem]"
+          style={{ backgroundColor: shoe.boxLabelColor }}
+        >
+          <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
         </div>
       </motion.button>
     );
@@ -206,21 +364,23 @@ function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="group relative block w-full overflow-hidden bg-transparent text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
         aria-label={`Open ${shoe.model}`}
+        {...hoverSoundHandlers}
       >
         <Image
-          src="/images/converse-box-transparent.png"
+          src="/images/converse-box.png"
           alt="Converse shoebox"
           width={730}
           height={253}
+          loading="eager"
           className="block h-auto w-full"
           sizes="(min-width: 1280px) 1120px, (min-width: 768px) 88vw, 94vw"
         />
 
         <div
-          className="absolute right-[3.2%] top-1/2 -translate-y-1/2 rounded-[0.85rem] bg-white px-5 py-3 text-[1.35rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-6 sm:text-[1.5rem]"
+          className="absolute right-[3.2%] top-[76%] -translate-y-1/2 rounded-[0.2rem] bg-white px-2.5 py-1.5 text-[0.9rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-3 sm:py-1.5 sm:text-[1.02rem]"
           style={{ backgroundColor: shoe.boxLabelColor }}
         >
-          <span className="block -rotate-[2deg] font-[cursive] tracking-tight">{shoe.collectionLabel}</span>
+          <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
         </div>
       </motion.button>
     );
@@ -235,6 +395,7 @@ function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="group relative block w-full rounded-[0.2rem] text-left shadow-[0_16px_30px_rgba(0,0,0,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black/30"
       aria-label={`Open ${shoe.model}`}
+      {...hoverSoundHandlers}
     >
       <div
         className="relative overflow-hidden rounded-[0.2rem] border border-black/10"
@@ -252,10 +413,10 @@ function CollectionBox({ shoe, onSelect }: { shoe: Sneaker; onSelect: () => void
             <BrandMark brand={shoe.brand} color={shoe.boxTextColor} />
           </div>
           <div
-            className="rounded-[0.85rem] px-5 py-3 text-[2rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-6 sm:text-[2.1rem]"
+            className="rounded-[0.2rem] px-2 py-2 text-[1.1rem] leading-none text-black shadow-[0_2px_4px_rgba(0,0,0,0.08)] sm:px-4 sm:text-[1.22rem]"
             style={{ backgroundColor: shoe.boxLabelColor }}
           >
-            <span className="block -rotate-[2deg] font-[cursive] tracking-tight">{shoe.collectionLabel}</span>
+            <span className="block -rotate-[2deg] tracking-tight" style={{ fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive" }}>{shoe.collectionLabel}</span>
           </div>
         </div>
       </div>
@@ -604,17 +765,17 @@ export function SneakPeekExperience() {
             animate={reduceMotion ? undefined : { opacity: 1 }}
             exit={reduceMotion ? undefined : { opacity: 0 }}
             transition={{ duration: 0.28 }}
-            className="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col justify-center px-4 py-10 sm:px-8"
+            className="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col justify-center px-4 py-8 sm:px-8 lg:py-6"
           >
-            <div className="mb-8 w-full max-w-[400px] text-left">
-              <h1 className="text-3xl font-semibold tracking-[-0.04em] text-[#111] sm:text-4xl">SneakPeek</h1>
-              <div className="mt-2 flex items-center gap-3">
-                <p className="text-sm text-black/45">Tap a box to open the pair.</p>
-                <Image src="/icon.png" alt="SneakPeek icon" width={34} height={34} className="h-8 w-8 shrink-0" priority />
+            <div className="mb-6 w-full max-w-[400px] text-left lg:mb-5">
+              <h1 className="text-3xl font-semibold tracking-[-0.04em] text-[#111] sm:text-4xl lg:text-[2.1rem]">SneakPeek</h1>
+              <div className="mt-2 flex items-center gap-3 lg:mt-1.5">
+                <p className="text-sm text-black/45 lg:text-[0.82rem]">Tap a box to open the pair.</p>
+                <Image src="/icon.png" alt="SneakPeek icon" width={34} height={34} className="h-8 w-8 shrink-0 lg:h-7 lg:w-7" priority />
               </div>
             </div>
 
-            <div className="mx-auto flex w-full max-w-[400px] flex-col gap-4 sm:gap-5 lg:max-w-[400px]">
+            <div className="mx-auto flex w-full max-w-[400px] flex-col gap-0.5 sm:gap-0.5 lg:max-w-[300px]">
               {shoes.map((shoe, index) => (
                 <motion.div
                   key={shoe.id}
