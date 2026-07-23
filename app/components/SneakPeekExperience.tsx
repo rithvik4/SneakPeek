@@ -429,18 +429,20 @@ function OpenBoxImageReveal({
   shoeImage,
   reduceMotion,
   compactBox = false,
+  subtleBox = false,
 }: {
   openBoxImage: string;
   shoeImage: string;
   reduceMotion: boolean;
   compactBox?: boolean;
+  subtleBox?: boolean;
 }) {
   const shoeInitialY = compactBox ? 94 : 80;
   const shoeFinalY = compactBox ? -46 : -78;
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[0.3rem]">
-      <div className={`absolute inset-0 ${compactBox ? "scale-[0.92] sm:scale-[0.9]" : "scale-[1.20]"}`}>
+      <div className={`absolute inset-0 ${compactBox ? "scale-[0.92] sm:scale-[0.9]" : subtleBox ? "scale-[1.10]" : "scale-[1.20]"}`}>
         <Image
           src={openBoxImage}
           alt="Open shoe box"
@@ -495,6 +497,7 @@ function OpenBoxDetail({
   reduceMotion: boolean;
 }) {
   const compactHeroArtwork = shoe.id === "dunk-low";
+  const subtleHeroArtwork = shoe.id === "new-balance-1906r";
   const swatches = shoe.detailColorSwatches && shoe.detailColorSwatches.length > 0
     ? shoe.detailColorSwatches
     : ["#ffffff", shoe.shoeAccentStart, shoe.boxColor];
@@ -554,9 +557,9 @@ function OpenBoxDetail({
       animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       exit={reduceMotion ? undefined : { opacity: 0, y: 20 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 pb-16 pt-10 text-center sm:px-8"
+      className="flex w-full flex-col items-center px-0 pb-16 pt-10 text-center sm:mx-auto sm:max-w-5xl sm:px-8"
     >
-      <div className="mb-5 flex w-full max-w-4xl items-center justify-between text-sm text-black/45 sm:mb-6">
+      <div className="mb-5 flex w-full max-w-4xl items-center justify-between px-4 text-sm text-black/45 sm:mb-6 sm:px-0">
         <button
           type="button"
           onClick={onBack}
@@ -567,7 +570,7 @@ function OpenBoxDetail({
         </button>
       </div>
 
-      <div className="grid w-full max-w-[46rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 sm:max-w-[56rem] sm:gap-5">
+      <div className="grid w-full max-w-[46rem] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-2 sm:max-w-[56rem] sm:gap-5 sm:px-0">
         <button
           type="button"
           onClick={onPrevious}
@@ -584,6 +587,7 @@ function OpenBoxDetail({
               shoeImage={shoe.detailShoeImage}
               reduceMotion={reduceMotion}
               compactBox={compactHeroArtwork}
+              subtleBox={subtleHeroArtwork}
             />
           ) : (
             <OpenBox3DScene boxColor={shoe.boxColor} shoeImage={shoe.detailShoeImage} reduceMotion={reduceMotion} />
@@ -600,7 +604,7 @@ function OpenBoxDetail({
         </button>
       </div>
 
-      <div className={shoe.id === "converse-chuck-70" ? "max-w-2xl -mt-16 sm:-mt-20 lg:-mt-24" : "max-w-2xl -mt-12 sm:-mt-16 lg:-mt-5"}>
+      <div className={shoe.id === "converse-chuck-70" ? "max-w-2xl -mt-16 px-4 sm:-mt-20 sm:px-0 lg:-mt-24" : "max-w-2xl -mt-12 px-4 sm:-mt-16 sm:px-0 lg:-mt-5"}>
         <h1 className="text-5xl font-semibold tracking-[-0.04em] text-[#111] sm:text-6xl">{shoe.model}</h1>
         <p className="mt-3 text-sm font-medium uppercase tracking-[0.26em] text-black/35">{shoe.brand}</p>
       </div>
@@ -622,9 +626,7 @@ function OpenBoxDetail({
         </p>
       </div>
 
-      <div
-        className="mx-auto mt-8 grid w-full max-w-[43rem] grid-cols-3 text-center sm:mt-9 sm:max-w-[46rem]"
-      >
+      <div className="mx-auto mt-8 grid w-full max-w-[43rem] grid-cols-3 px-2 text-center sm:mt-9 sm:max-w-[46rem] sm:px-0">
         <div className="border-b border-r p-5 sm:p-6" style={{ borderColor: hexToRgba(neutralTone, 0.22) }}>
           <p className="text-xs uppercase tracking-[0.2em] text-black/45">Size</p>
           <p className="mt-4 text-[1.6rem] font-medium leading-snug tracking-[-0.02em] text-[#111] sm:text-[1.75rem]">{shoe.size}</p>
@@ -664,7 +666,7 @@ function OpenBoxDetail({
         </div>
       </div>
 
-      <div className="mt-12 w-full max-w-[43rem] sm:mt-14 sm:max-w-[46rem]">
+      <div className="mt-12 w-full max-w-[43rem] px-4 sm:mt-14 sm:max-w-[46rem] sm:px-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-[#111] sm:text-xl">Real photos</h2>
         </div>
@@ -692,7 +694,7 @@ function OpenBoxDetail({
         </div>
       </div>
 
-      <div className="mt-12 w-full max-w-[43rem] sm:mt-16 sm:max-w-[46rem]">
+      <div className="mt-12 w-full max-w-[43rem] px-4 sm:mt-16 sm:max-w-[46rem] sm:px-0">
         <div className="mb-4 flex items-center gap-2">
           <h2 className="text-lg font-semibold text-[#111] sm:text-xl">Styling inspiration</h2>
           <div className="group relative inline-flex items-center justify-center">
@@ -747,7 +749,7 @@ export function SneakPeekExperience() {
   };
 
   return (
-    <div className="min-h-screen text-[#111]" style={{ background: pageBackground }}>
+    <div className="min-h-screen w-full overflow-x-hidden text-[#111]" style={{ background: pageBackground }}>
       <AnimatePresence mode="wait">
         {selectedShoe ? (
           <OpenBoxDetail
@@ -765,7 +767,7 @@ export function SneakPeekExperience() {
             animate={reduceMotion ? undefined : { opacity: 1 }}
             exit={reduceMotion ? undefined : { opacity: 0 }}
             transition={{ duration: 0.28 }}
-            className="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col justify-center px-4 py-8 sm:px-8 lg:py-6"
+            className="mx-auto flex min-h-screen w-full max-w-[1320px] flex-col justify-center px-3 py-8 sm:px-8 lg:py-6"
           >
             <div className="mb-6 w-full max-w-[400px] text-left lg:mb-5">
               <h1 className="text-3xl font-semibold tracking-[-0.04em] text-[#111] sm:text-4xl lg:text-[2.1rem]">SneakPeek</h1>

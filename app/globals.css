@@ -17,6 +17,14 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), sans-serif;
   text-rendering: optimizeLegibility;
+  margin: 0;
+  width: 100%;
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+html {
+  width: 100%;
 }
 
 h1,

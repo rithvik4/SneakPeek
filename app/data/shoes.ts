@@ -111,7 +111,14 @@ export const shoes: Sneaker[] = [
     story: "A tech-runner look that feels modern, sharp, and easy to wear every day.",
     material: "Mesh, synthetic & rubber",
     detailColorSwatches: ["#f2f2f2", "#5f6670", "#111111"],
-    gallery: ["/images/dunk-1.svg"],
+    gallery: [
+      "/images/new balance shoe.png",
+      "/images/new balance shoe.png",
+      "/images/new balance shoe.png"
+    ],
+    detailShoeImage: "/images/new balance shoe.png",
+    detailOpenBoxImage: "/images/New balance box open.png",
+    detailClosedBoxImage: "/images/new-balance-box-1.png",
     hotspots: [],
     boxColor: "#5f6670",
     boxTextColor: "#ffffff",
